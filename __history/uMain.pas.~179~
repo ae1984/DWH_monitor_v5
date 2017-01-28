@@ -1,0 +1,417 @@
+unit uMain;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Vcl.ExtCtrls, Vcl.Grids,
+  Vcl.DBGrids, Data.Win.ADODB, Vcl.StdCtrls, VclTee.TeeGDIPlus, VCLTee.TeEngine,
+  VCLTee.Series, VCLTee.TeeProcs, VCLTee.Chart, Vcl.DBCtrls,DateUtils;
+const count_tick = 3600;
+      tick_sec = 4;
+type
+  TfMain = class(TForm)
+    ADOConnection1: TADOConnection;
+    ADO_PX_USE: TADOQuery;
+    ds_ado_px_use: TDataSource;
+    Timer1: TTimer;
+    Chart1: TChart;
+    Panel1: TPanel;
+    btnOnMon: TButton;
+    Panel2: TPanel;
+    Panel3: TPanel;
+    Label1: TLabel;
+    DBText1: TDBText;
+    DBText2: TDBText;
+    DBText3: TDBText;
+    Label2: TLabel;
+    Label3: TLabel;
+    btnGetUserUsePX: TButton;
+    ADO_CPU_UTILIZ: TADOQuery;
+    Timer2: TTimer;
+    Chart2: TChart;
+    Label5: TLabel;
+    Label6: TLabel;
+    DBText4: TDBText;
+    ds_ADO_CPU_UTILIZ: TDataSource;
+    DBText5: TDBText;
+    Series2: TLineSeries;
+    Series1: TLineSeries;
+    btnDetail: TButton;
+    btnETL: TButton;
+    Timer3: TTimer;
+    Panel4: TPanel;
+    Timer15_m: TTimer;
+    Panel5: TPanel;
+    StringGrid1: TStringGrid;
+    StringGrid2: TStringGrid;
+    btnCheck: TButton;
+    StringGrid3: TStringGrid;
+    Chart3: TChart;
+    Label4: TLabel;
+    ADO_PGA_ALLOC: TADOQuery;
+    Series3: TFastLineSeries;
+    ADO_MON_EXEC: TADOQuery;
+    DBText6: TDBText;
+    ds_MON_EXEC: TDataSource;
+    ADO_MON_EXEC2: TADOQuery;
+    DataSource1: TDataSource;
+    ds_MON_EXEC2: TDataSource;
+    DBText7: TDBText;
+    Label7: TLabel;
+    Label8: TLabel;
+    procedure Timer1Timer(Sender: TObject);
+    procedure btnOnMonClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure btnGetUserUsePXClick(Sender: TObject);
+    procedure Timer2Timer(Sender: TObject);
+    procedure btnDetailClick(Sender: TObject);
+    procedure btnETLClick(Sender: TObject);
+    procedure Timer3Timer(Sender: TObject);
+    procedure Timer15_mTimer(Sender: TObject);
+    procedure btnCheckClick(Sender: TObject);
+    procedure StringGrid1DblClick(Sender: TObject);
+    procedure StringGrid2DblClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+      //28800
+    a: array [1..count_tick] of integer;
+    b: array [1..count_tick] of integer;
+    c: array [1..count_tick] of integer;
+  end;
+  TMyThread = class(TThread) //MyThread - заданное нами имя потока.
+  private
+    { Private declarations }
+  protected
+      procedure Execute; override;
+  end;
+
+
+
+  TSIMPLE_Thread = class(TThread) //MyThread - заданное нами имя потока.
+  private
+    { Private declarations }
+  protected
+      procedure Execute; override;
+  end;
+var
+  fMain: TfMain;
+  MyThread: TMyThread;
+
+  SIMPLE_Thread:TSIMPLE_Thread;
+
+implementation
+
+{$R *.dfm}
+
+uses uSQLID, uETL_STAT, uETL_RUNNING, uNV_WAIT, uDAILY_ADD, uUSERSQL;
+procedure TMyThread.Execute;
+var
+   ADOQuery: TADOQuery;
+   i, j: Integer;
+begin
+   with fMain.StringGRid2 do
+    for i:=0 to RowCount-1 do
+      begin
+        Rows[i].Clear;
+        //Cells[0, i]:='Заголовок строки i';
+      end;
+   fMain.StringGRid2.Cells[0,0]:= 'Ждите...';
+   ADOQuery:= TADOQuery.Create(nil);
+   ADOQuery.ConnectionString:='Provider=OraOLEDB.Oracle.1;Password=mars2015;Persist Security Info=True;User ID=u1;Data Source=rdwh;Extended Properties=""';
+   //ADOQuery.Connection:=fMain.ADOConnection1;
+   ADOQuery.SQL.Clear;
+   ADOQuery.SQL.Add('select nvl(t.username,'''')||''-''||nvl(t.osuser,'''') as osuser ,count(*) as cnt ');
+   ADOQuery.SQL.Add('from V$SESSION t ');
+   ADOQuery.SQL.Add('group by t.username,t.osuser ');
+   ADOQuery.SQL.Add('order by count(*) desc ');
+   ADOQuery.Active:=True;
+   //ShowMessage(inttoStr(ADOQuery.RecordCount));
+   //ADOQuery.Open;
+   fMain.StringGRid2.RowCount:=ADOQuery.RecordCount;
+   i:=0;
+   while not(ADOQuery.Eof) do  begin
+     fMain.StringGRid2.Cells[0,i]:= ADOQuery.FieldByName('osuser').AsString;
+     fMain.StringGRid2.Cells[1,i]:= ADOQuery.FieldByName('cnt').AsString;
+     inc(i);
+     ADOQuery.Next;
+   end;
+   ADOQuery.Free;
+end;
+
+procedure TSIMPLE_Thread.Execute;
+var
+   ADOQuery: TADOQuery;
+   i, j: Integer;
+begin
+   try
+      {with fMain.StringGRid1 do
+        for i:=1 to RowCount-1 do   //Заголовки строк не трогаем
+        for j:=1 to ColCount-1 do   //Заголовки столбцов не трогаем
+          Cells[j, i]:='';}
+       ADOQuery:= TADOQuery.Create(nil);
+       ADOQuery.ConnectionString:='Provider=OraOLEDB.Oracle.1;Password=mars2015;Persist Security Info=True;User ID=u1;Data Source=rdwh;Extended Properties=""';
+
+       ADOQuery.Active:=False;
+       ADOQuery.SQL.Clear;
+       ADOQuery.SQL.Add('select * from NV_SYS_PARAM  ');
+       ADOQuery.Active:=True;
+       with fMain.StringGRid3 do
+        for i:=1 to RowCount-1 do  //Заголовки столбцов не трогаем - цикл от 1
+          begin
+            Rows[i].Clear;
+            //Cells[0, i]:='Заголовок строки i';
+          end;
+       fMain.StringGRid3.FixedRows:=1;
+       i:=0;
+       fMain.StringGRid3.Cells[0,0]:= 'NAME';
+       fMain.StringGRid3.Cells[1,0]:= 'VALUE';
+       fMain.StringGRid3.RowCount:=ADOQuery.RecordCount+1;
+       while not(ADOQuery.Eof) do  begin
+          inc(i);
+          fMain.StringGRid3.Cells[0,i]:= ADOQuery.FieldByName('NAME').AsString;
+          fMain.StringGRid3.Cells[1,i]:= ADOQuery.FieldByName('VALUE').AsString;
+          ADOQuery.Next;
+       end;
+
+
+   finally
+     ADOQuery.Free;
+   end;
+
+   try
+       ADOQuery:= TADOQuery.Create(nil);
+       //ADOQuery.ConnectionString:='Provider=OraOLEDB.Oracle.1;Password=mars2015;Persist Security Info=True;User ID=u1;Data Source=rdwh;Extended Properties=""';
+       ADOQuery.ConnectionString:='Provider=OraOLEDB.Oracle.1;Password=mars2015;Persist Security Info=True;User ID=u1;Data Source=rdwh;Extended Properties=""';
+       ADOQuery.Active:=False;
+       ADOQuery.SQL.Clear;
+       ADOQuery.SQL.Add('select * from NT_ALERTS_RT t order by t.alert_name');
+       ADOQuery.Active:=True;
+       if ADOQuery.RecordCount > 0 then begin
+         with fMain.StringGRid1 do
+          for i:=1 to RowCount-1 do  //Заголовки столбцов не трогаем - цикл от 1
+            begin
+              Rows[i].Clear;
+              //Cells[0, i]:='Заголовок строки i';
+            end;
+         fMain.StringGRid1.RowCount:=3;
+         fMain.StringGRid1.FixedRows:=1;
+         i:=0;
+         fMain.StringGRid1.Cells[0,0]:= 'ALERT_NAME';
+         fMain.StringGRid1.Cells[1,0]:= 'STATUS';
+         fMain.StringGRid1.RowCount:=ADOQuery.RecordCount+1;
+         while not(ADOQuery.Eof) do  begin
+            inc(i);
+            fMain.StringGRid1.Cells[0,i]:= ADOQuery.FieldByName('ALERT_NAME').AsString;
+            fMain.StringGRid1.Cells[1,i]:= ADOQuery.FieldByName('STATUS').AsString;
+            ADOQuery.Next;
+         end;
+       end;
+
+   finally
+     ADOQuery.Free;
+   end;
+end;
+
+
+
+
+
+procedure TfMain.btnCheckClick(Sender: TObject);
+begin
+   SIMPLE_Thread:=TSIMPLE_Thread.Create(True);
+   SIMPLE_Thread.Priority:=tpLower;
+   SIMPLE_Thread.Resume;
+end;
+
+procedure TfMain.btnDetailClick(Sender: TObject);
+begin
+   fSQLID.Showmodal;
+end;
+
+procedure TfMain.btnETLClick(Sender: TObject);
+begin
+   fETL_STAT.ShowModal;
+end;
+
+procedure TfMain.btnGetUserUsePXClick(Sender: TObject);
+begin
+//Вначале нужно создать экземпляр потока:
+  MyThread:=TMyThread.Create(True);
+  MyThread.Priority:=tpLower;
+//Параметр False запускает поток сразу после создания, True - запуск впоследствии , методом Resume
+//Далее можно указать параметры потока, например приоритет:
+  MyThread.Resume;
+end;
+
+procedure TfMain.btnOnMonClick(Sender: TObject);
+begin
+   Timer1.Enabled:= True;
+   Timer2.Enabled:= True;
+
+   ADO_CPU_UTILIZ.Close;
+   ADO_CPU_UTILIZ.Open;
+end;
+
+procedure TfMain.FormShow(Sender: TObject);
+var
+   i: integer;
+begin
+   Timer1.Interval:=tick_sec*1000;
+   //Label4.Caption:='Окно в '+IntToStr(trunc(count_tick*tick_sec/60/60))+'часа';
+   for I := 1 to count_tick do  begin a[i]:=0; b[i]:=0; end;
+   //Chart1.BottomAxis.
+
+   btnOnMon.Click;
+
+   SIMPLE_Thread:=TSIMPLE_Thread.Create(True);
+   SIMPLE_Thread.Priority:=tpLower;
+   SIMPLE_Thread.Resume;
+
+   btnGetUserUsePX.Click;
+
+end;
+
+procedure TfMain.StringGrid1DblClick(Sender: TObject);
+begin
+    //showmessage(fMain.StringGRid1.Cells[0,fMain.StringGRid1.row]);
+    //showmessage(inttostr(fMain.StringGRid1.Col));
+    //showmessage(inttostr(fMain.StringGRid1.row));
+    if fMain.StringGRid1.Cells[0,fMain.StringGRid1.row]='DAILY_MAIN' then  fNV_ETL_RUNNING.showmodal;
+    if fMain.StringGRid1.Cells[0,fMain.StringGRid1.row]='DAILY_ADD' then  fDAILY_ADD.showmodal;
+    if fMain.StringGRid1.Cells[0,fMain.StringGRid1.row]='WAIT' then  fNV_WAIT.showmodal;
+end;
+
+
+procedure TfMain.StringGrid2DblClick(Sender: TObject);
+begin
+   fUSERSQL.ADOQuery1.SQL.Clear;
+   fUSERSQL.ADOQuery1.SQL.Text:=
+    'select t.sql_id,t.module, t.machine, t.username,t.osuser,t.cnt_ses,s.sql_fulltext '+
+    'from ('+
+    'select '+
+    '      sysdate as sdt'+
+    '      ,t.sql_id,t.username, t.machine'+
+    '      ,t.osuser,t.module,count(*) as cnt_ses'+
+    'from V$SESSION t'+
+    'group by t.sql_id,t.module, t.machine, t.username,t.osuser'+
+    ') t'+
+    'left join NT_SQLID s on s.sql_id = t.sql_id'+
+    'where nvl(t.username,'''')||''-''||nvl(t.osuser,'''') = '+fMain.StringGRid2.Cells[0,fMain.StringGRid1.row]+'  '+
+    'order by t.cnt_ses desc';
+   fUSERSQL.Showmodal;
+end;
+
+procedure TfMain.Timer15_mTimer(Sender: TObject);
+var Hour, Min, Sec, MSec: Word;
+   Year, Month, Day: Word;
+begin
+    DecodeTime(now,  Hour, Min, Sec, MSec);
+    DecodeDate(now, Year, Month, Day);
+    if ADOConnection1.Connected  then begin
+        SIMPLE_Thread:=TSIMPLE_Thread.Create(True);
+        SIMPLE_Thread.Priority:=tpLower;
+        SIMPLE_Thread.Resume;
+
+        btnGetUserUsePX.Click;
+    end;
+
+    {if ADOConnection1.Connected and (Hour = 10) or (Hour = 16)  then begin
+
+
+    end;}
+
+    Timer15_m.Interval:=300000;  //5минут
+
+end;
+
+procedure TfMain.Timer1Timer(Sender: TObject);
+var i: integer;
+    str: string;
+begin
+  try
+    if ADOConnection1.Connected then begin
+       ADO_PX_USE.Close;
+       ADO_PX_USE.Open;
+       ADO_PGA_ALLOC.Close;
+       ADO_PGA_ALLOC.Open;
+       ADO_MON_EXEC.Close;
+       ADO_MON_EXEC.Open;
+       ADO_MON_EXEC2.Close;
+       ADO_MON_EXEC2.Open;
+    end;
+    for i := 1 to count_tick-1 do begin
+       a[i]:=a[i+1];
+       b[i]:=b[i+1];
+       c[i]:=c[i+1];
+    end;
+    a[count_tick]:=ADO_PX_USE.FieldByName('px_use').AsInteger;
+    b[count_tick]:= round(ADO_CPU_UTILIZ.FieldByName('val').AsFloat);
+    c[count_tick]:= round(ADO_PGA_ALLOC.FieldByName('value').AsFloat);
+    {for i:=0 to count_tick-1 do begin
+      str:=FormatDateTime('hh:mm:ss', IncSecond(IncSecond(Now,(count_tick*tick_sec)*-1),(i+1)*tick_sec));
+      Series1.AddY(i,str);
+      Series2.AddY(i,str);
+    end;}
+
+    Series1.Clear;
+    Series2.Clear;
+    Series3.Clear;
+    for i:=0 to count_tick-1 do begin
+      str:=FormatDateTime('hh:mm:ss', IncSecond(IncSecond(Now,count_tick*tick_sec*-1),(i+1)*tick_sec));
+      Series1.AddXY(i, a[i+1], str, clBlue);
+      Series2.AddXY(i, b[i+1], str, clBlue);
+      Series3.AddXY(i, c[i+1], str, clBlue);
+    end;
+
+  except
+    ADOConnection1.Connected:=false;
+    //timer1.Enabled:=false;
+    btnOnMon.Enabled:=False;
+    Timer3.Interval:=10000;
+    Timer3.Enabled:=true;
+    //ShowMessage('Возникла ошибка при получении данных из RDWH');
+  end;
+
+end;
+
+
+procedure TfMain.Timer2Timer(Sender: TObject);
+var i: integer;
+begin
+  try
+     if ADOConnection1.Connected then begin
+        ADO_CPU_UTILIZ.Close;
+        ADO_CPU_UTILIZ.Open;
+     end;
+  except
+    ADOConnection1.Connected:=false;
+    timer2.Enabled:=false;
+    btnOnMon.Enabled:=False;
+    Timer3.Interval:=10000;
+    Timer3.Enabled:=true;
+  end;
+
+end;
+
+procedure TfMain.Timer3Timer(Sender: TObject);
+begin
+try
+   ADOConnection1.Connected:=false;
+   ADOConnection1.ConnectionString:='Provider=OraOLEDB.Oracle.1;Password=mars2015;Persist Security Info=True;User ID=u1;Data Source=rdwh;Extended Properties=""';
+   ADOConnection1.Connected:=true;
+   Timer3.Enabled:=false;
+   timer1.Enabled:=true;
+   timer2.Enabled:=true;
+   btnOnMon.Enabled:=true;
+   ADO_CPU_UTILIZ.Close;
+   ADO_CPU_UTILIZ.Open;
+except
+   Timer3.Interval:=10000;
+   Timer3.Enabled:=true;
+end;
+end;
+
+end.

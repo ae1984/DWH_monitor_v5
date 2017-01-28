@@ -1,0 +1,20 @@
+program dwh_monitor;
+
+uses
+  Vcl.Forms,
+  uMain in 'uMain.pas' {fMain},
+  uSQLID in 'uSQLID.pas' {fSQLID},
+  uETL_STAT in 'uETL_STAT.pas' {fETL_STAT},
+  uETL_RUNNING in 'uETL_RUNNING.pas' {Form1};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TfMain, fMain);
+  Application.CreateForm(TfSQLID, fSQLID);
+  Application.CreateForm(TfETL_STAT, fETL_STAT);
+  Application.CreateForm(TForm1, Form1);
+  Application.Run;
+end.

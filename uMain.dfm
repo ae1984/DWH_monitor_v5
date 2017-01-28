@@ -1,0 +1,542 @@
+object fMain: TfMain
+  Left = 0
+  Top = 0
+  BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsSingle
+  ClientHeight = 858
+  ClientWidth = 1237
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  OnShow = FormShow
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Chart3: TChart
+    Left = 151
+    Top = 564
+    Width = 930
+    Height = 256
+    Legend.Visible = False
+    Title.Text.Strings = (
+      'total PGA allocated')
+    BottomAxis.Axis.Width = 0
+    DepthAxis.Axis.Width = 0
+    DepthTopAxis.Axis.Width = 0
+    LeftAxis.Automatic = False
+    LeftAxis.AutomaticMaximum = False
+    LeftAxis.AutomaticMinimum = False
+    LeftAxis.Axis.Width = 0
+    LeftAxis.ExactDateTime = False
+    LeftAxis.Increment = 25.000000000000000000
+    LeftAxis.Maximum = 305.000000000000000000
+    RightAxis.Axis.Width = 0
+    TopAxis.Axis.Width = 0
+    View3D = False
+    TabOrder = 7
+    DefaultCanvas = 'TGDIPlusCanvas'
+    PrintMargins = (
+      15
+      36
+      15
+      36)
+    ColorPaletteIndex = 13
+    object Label4: TLabel
+      Left = 64
+      Top = 580
+      Width = 31
+      Height = 13
+      Caption = 'Label4'
+    end
+    object Series3: TFastLineSeries
+      SeriesColor = clBlue
+      LinePen.Color = clBlue
+      XValues.Name = 'X'
+      XValues.Order = loAscending
+      YValues.Name = 'Y'
+      YValues.Order = loNone
+    end
+  end
+  object Chart2: TChart
+    Left = 151
+    Top = 318
+    Width = 930
+    Height = 256
+    Legend.Visible = False
+    Title.Text.Strings = (
+      'Host CPU Utilization (%)')
+    BottomAxis.Axis.Width = 0
+    DepthAxis.Axis.Width = 0
+    DepthTopAxis.Axis.Width = 0
+    LeftAxis.Automatic = False
+    LeftAxis.AutomaticMaximum = False
+    LeftAxis.AutomaticMinimum = False
+    LeftAxis.Axis.Width = 0
+    LeftAxis.Maximum = 102.000000000000000000
+    RightAxis.Axis.Width = 0
+    TopAxis.Axis.Width = 0
+    View3D = False
+    TabOrder = 4
+    DefaultCanvas = 'TGDIPlusCanvas'
+    PrintMargins = (
+      15
+      36
+      15
+      36)
+    ColorPaletteIndex = 13
+    object Label5: TLabel
+      Left = 64
+      Top = 580
+      Width = 31
+      Height = 13
+      Caption = 'Label4'
+    end
+    object Series2: TLineSeries
+      SeriesColor = 13246208
+      Brush.BackColor = clDefault
+      Pointer.InflateMargins = True
+      Pointer.Style = psRectangle
+      XValues.Name = 'X'
+      XValues.Order = loAscending
+      YValues.Name = 'Y'
+      YValues.Order = loNone
+    end
+  end
+  object Chart1: TChart
+    Left = 147
+    Top = 35
+    Width = 930
+    Height = 294
+    Legend.Visible = False
+    Title.Text.Strings = (
+      'Use PX-process')
+    BottomAxis.Axis.Width = 0
+    DepthAxis.Axis.Width = 0
+    DepthTopAxis.Axis.Width = 0
+    LeftAxis.Automatic = False
+    LeftAxis.AutomaticMaximum = False
+    LeftAxis.AutomaticMinimum = False
+    LeftAxis.Axis.Width = 0
+    LeftAxis.Maximum = 1250.000000000000000000
+    RightAxis.Axis.Width = 0
+    TopAxis.Axis.Width = 0
+    View3D = False
+    TabOrder = 0
+    DefaultCanvas = 'TGDIPlusCanvas'
+    PrintMargins = (
+      15
+      32
+      15
+      32)
+    ColorPaletteIndex = 13
+    object Series1: TLineSeries
+      Selected.Hover.Visible = False
+      SeriesColor = 13246208
+      Brush.BackColor = clDefault
+      LinePen.Color = 10708548
+      Pointer.InflateMargins = True
+      Pointer.Style = psRectangle
+      TreatNulls = tnIgnore
+      XValues.Name = 'X'
+      XValues.Order = loAscending
+      YValues.Name = 'Y'
+      YValues.Order = loNone
+    end
+  end
+  object Panel1: TPanel
+    Left = 0
+    Top = 819
+    Width = 1237
+    Height = 39
+    Align = alBottom
+    TabOrder = 1
+    ExplicitTop = 818
+    object btnOnMon: TButton
+      Left = 952
+      Top = 7
+      Width = 129
+      Height = 25
+      Caption = #1042#1082#1083#1102#1095#1080#1090#1100' '#1084#1086#1085#1080#1090#1086#1088
+      TabOrder = 0
+      Visible = False
+      OnClick = btnOnMonClick
+    end
+  end
+  object Panel2: TPanel
+    Left = 0
+    Top = 0
+    Width = 1237
+    Height = 49
+    Align = alTop
+    TabOrder = 2
+    object Label1: TLabel
+      Left = 16
+      Top = 5
+      Width = 181
+      Height = 13
+      Caption = #1042#1088#1077#1084#1103' '#1089#1085#1103#1090#1080#1103' '#1087#1086#1089#1083#1077#1076#1085#1080#1093' '#1087#1086#1082#1072#1079#1072#1085#1080#1081
+    end
+    object DBText1: TDBText
+      Left = 215
+      Top = 5
+      Width = 121
+      Height = 17
+      DataField = 'DT'
+      DataSource = ds_ado_px_use
+    end
+    object DBText2: TDBText
+      Left = 59
+      Top = 24
+      Width = 42
+      Height = 17
+      DataField = 'PX_USE'
+      DataSource = ds_ado_px_use
+    end
+    object DBText3: TDBText
+      Left = 175
+      Top = 24
+      Width = 42
+      Height = 17
+      DataField = 'PX_NOT_USE'
+      DataSource = ds_ado_px_use
+    end
+    object Label2: TLabel
+      Left = 16
+      Top = 24
+      Width = 37
+      Height = 13
+      Caption = 'PX-use:'
+    end
+    object Label3: TLabel
+      Left = 107
+      Top = 24
+      Width = 62
+      Height = 13
+      Caption = 'PX-available:'
+    end
+    object Label6: TLabel
+      Left = 246
+      Top = 24
+      Width = 120
+      Height = 13
+      Caption = 'Host CPU Utilization (%):'
+    end
+    object DBText4: TDBText
+      Left = 372
+      Top = 24
+      Width = 117
+      Height = 17
+      DataField = 'DT'
+      DataSource = ds_ADO_CPU_UTILIZ
+    end
+    object DBText5: TDBText
+      Left = 485
+      Top = 24
+      Width = 116
+      Height = 17
+      DataField = 'VAL'
+      DataSource = ds_ADO_CPU_UTILIZ
+    end
+    object DBText6: TDBText
+      Left = 1058
+      Top = 0
+      Width = 178
+      Height = 17
+      DataField = 'LAST_EXEC'
+      DataSource = ds_MON_EXEC
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object DBText7: TDBText
+      Left = 1058
+      Top = 23
+      Width = 178
+      Height = 17
+      DataField = 'LAST_EXEC'
+      DataSource = ds_MON_EXEC2
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object Label7: TLabel
+      Left = 1001
+      Top = 4
+      Width = 52
+      Height = 13
+      Caption = 'CREATOR:'
+    end
+    object Label8: TLabel
+      Left = 973
+      Top = 27
+      Width = 80
+      Height = 13
+      Caption = 'COORDINATOR:'
+    end
+  end
+  object Panel3: TPanel
+    Left = 0
+    Top = 600
+    Width = 177
+    Height = 220
+    TabOrder = 3
+    object btnGetUserUsePX: TButton
+      Left = 1
+      Top = 194
+      Width = 175
+      Height = 25
+      Align = alBottom
+      Caption = #1050#1090#1086' '#1079#1072#1085#1103#1083' '#1089#1077#1089#1089#1080#1080'?'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -9
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 0
+      OnClick = btnGetUserUsePXClick
+    end
+    object StringGrid2: TStringGrid
+      Left = 1
+      Top = 1
+      Width = 175
+      Height = 193
+      Align = alClient
+      ColCount = 2
+      DefaultRowHeight = 15
+      FixedCols = 0
+      RowCount = 4
+      FixedRows = 0
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -9
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 1
+      OnDblClick = StringGrid2DblClick
+      ColWidths = (
+        116
+        32)
+      RowHeights = (
+        15
+        15
+        15
+        15)
+    end
+  end
+  object Panel4: TPanel
+    Left = 0
+    Top = 49
+    Width = 177
+    Height = 552
+    TabOrder = 5
+    object StringGrid3: TStringGrid
+      Left = 1
+      Top = 1
+      Width = 175
+      Height = 550
+      Align = alClient
+      ColCount = 2
+      DefaultRowHeight = 15
+      FixedCols = 0
+      RowCount = 4
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -9
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 0
+      ColWidths = (
+        113
+        44)
+      RowHeights = (
+        15
+        15
+        15
+        15)
+    end
+  end
+  object Panel5: TPanel
+    Left = 1063
+    Top = 49
+    Width = 174
+    Height = 770
+    Align = alRight
+    TabOrder = 6
+    ExplicitHeight = 768
+    object StringGrid1: TStringGrid
+      Left = 1
+      Top = 1
+      Width = 172
+      Height = 743
+      Align = alClient
+      ColCount = 2
+      DefaultRowHeight = 15
+      FixedCols = 0
+      RowCount = 4
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -9
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 0
+      OnDblClick = StringGrid1DblClick
+      ExplicitHeight = 741
+      ColWidths = (
+        92
+        55)
+      RowHeights = (
+        15
+        15
+        15
+        15)
+    end
+    object btnCheck: TButton
+      Left = 1
+      Top = 744
+      Width = 172
+      Height = 25
+      Align = alBottom
+      Caption = 'btnCheck'
+      TabOrder = 1
+      OnClick = btnCheckClick
+      ExplicitTop = 742
+    end
+  end
+  object ADOConnection1: TADOConnection
+    Connected = True
+    ConnectionString = 
+      'Provider=OraOLEDB.Oracle.1;Password=mars2015;Persist Security In' +
+      'fo=True;User ID=u1;Data Source=rdwh'
+    LoginPrompt = False
+    Provider = 'OraOLEDB.Oracle.1'
+    Left = 216
+    Top = 80
+  end
+  object ADO_PX_USE: TADOQuery
+    Connection = ADOConnection1
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      'select '
+      '    sysdate as dt'
+      
+        '    ,(select t.VALUE from v$px_process_sysstat t where t.STATIST' +
+        'IC = '#39'Servers In Use                '#39') as px_use'
+      
+        '    ,(select t.VALUE from v$px_process_sysstat t where t.STATIST' +
+        'IC = '#39'Servers Available             '#39') as px_not_use'
+      'from dual')
+    Left = 296
+    Top = 72
+  end
+  object ds_ado_px_use: TDataSource
+    DataSet = ADO_PX_USE
+    Left = 528
+    Top = 128
+  end
+  object Timer1: TTimer
+    Enabled = False
+    Interval = 8000
+    OnTimer = Timer1Timer
+    Left = 248
+    Top = 432
+  end
+  object ADO_CPU_UTILIZ: TADOQuery
+    Connection = ADOConnection1
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      'select '
+      '   t.END_TIME as dt,t.value as val'
+      '   ,(sysdate - t.END_TIME)*3600*24'
+      'from v$sysmetric t '
+      'where t.metric_name = '#39'Host CPU Utilization (%)'#39
+      '      and (sysdate - t.END_TIME)*3600*24 <18'
+      '      and rownum <= 1')
+    Left = 296
+    Top = 176
+  end
+  object Timer2: TTimer
+    Enabled = False
+    Interval = 18000
+    OnTimer = Timer2Timer
+    Left = 288
+    Top = 432
+  end
+  object ds_ADO_CPU_UTILIZ: TDataSource
+    DataSet = ADO_CPU_UTILIZ
+    Left = 528
+    Top = 72
+  end
+  object Timer3: TTimer
+    Interval = 100
+    OnTimer = Timer3Timer
+    Left = 328
+    Top = 432
+  end
+  object Timer15_m: TTimer
+    Interval = 100
+    OnTimer = Timer15_mTimer
+    Left = 440
+    Top = 432
+  end
+  object ADO_PGA_ALLOC: TADOQuery
+    Connection = ADOConnection1
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      
+        'select value/1024/1024/1024 as value from v$pgastat where name =' +
+        ' '#39'total PGA allocated'#39)
+    Left = 291
+    Top = 243
+  end
+  object ADO_MON_EXEC: TADOQuery
+    Connection = ADOConnection1
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      'select max(ins_dt) as last_exec from NT_TASKS_EXECUTE t ')
+    Left = 291
+    Top = 307
+  end
+  object ds_MON_EXEC: TDataSource
+    DataSet = ADO_MON_EXEC
+    Left = 528
+    Top = 208
+  end
+  object ADO_MON_EXEC2: TADOQuery
+    Connection = ADOConnection1
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      
+        'select max(ins_dt) as last_exec from NT_TASKS_EXECUTE t where t.' +
+        'task_id is not null')
+    Left = 283
+    Top = 363
+  end
+  object DataSource1: TDataSource
+    DataSet = ADO_MON_EXEC
+    Left = 65528
+    Top = 320
+  end
+  object ds_MON_EXEC2: TDataSource
+    DataSet = ADO_MON_EXEC2
+    Left = 528
+    Top = 264
+  end
+end

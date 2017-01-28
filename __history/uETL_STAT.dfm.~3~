@@ -1,0 +1,147 @@
+object fETL_STAT: TfETL_STAT
+  Left = 0
+  Top = 0
+  Caption = 'fETL_STAT'
+  ClientHeight = 662
+  ClientWidth = 620
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Panel1: TPanel
+    Left = 0
+    Top = 621
+    Width = 620
+    Height = 41
+    Align = alBottom
+    TabOrder = 0
+    ExplicitLeft = 384
+    ExplicitTop = 192
+    ExplicitWidth = 185
+    object btnRefresh_data: TButton
+      Left = 16
+      Top = 6
+      Width = 105
+      Height = 25
+      Caption = 'btnRefresh_data'
+      TabOrder = 0
+      OnClick = btnRefresh_dataClick
+    end
+  end
+  object Panel2: TPanel
+    Left = 0
+    Top = 0
+    Width = 620
+    Height = 621
+    Align = alClient
+    TabOrder = 1
+    ExplicitTop = -6
+    ExplicitWidth = 923
+    ExplicitHeight = 633
+    object DBGrid1: TDBGrid
+      Left = 1
+      Top = 1
+      Width = 618
+      Height = 619
+      Align = alClient
+      DataSource = DataSource1
+      TabOrder = 0
+      TitleFont.Charset = DEFAULT_CHARSET
+      TitleFont.Color = clWindowText
+      TitleFont.Height = -11
+      TitleFont.Name = 'Tahoma'
+      TitleFont.Style = []
+      Columns = <
+        item
+          Expanded = False
+          FieldName = 'OBJECT_NAME'
+          Width = 200
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'BEGIN_REFRESH_LAG'
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'CNT_LAG'
+          Width = 50
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'BEGIN_REFRESH'
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'CNT'
+          Width = 29
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'DURATION'
+          Width = 60
+          Visible = True
+        end>
+    end
+  end
+  object ADOQuery1: TADOQuery
+    Active = True
+    Connection = fMain.ADOConnection1
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      'select '
+      '     t.object_name'
+      '     ,t.duration as duration_lag'
+      '     ,t.begin_refresh as begin_refresh_lag'
+      '     ,t.end_refresh as end_refresh_lag'
+      '     ,t.cnt as cnt_lag'
+      '     ,a.duration'
+      '     ,a.begin_refresh'
+      '     ,a.end_refresh'
+      '     ,a.cnt'
+      'from ('
+      '    select '
+      '         t.object_name '
+      
+        '        ,trunc((max(t.end_refresh) - min(t.begin_refresh))*60*24' +
+        ') as duration'
+      '        ,min(t.begin_refresh) as begin_refresh'
+      '        ,max(t.end_refresh) as end_refresh'
+      '        ,count(*) as cnt'
+      '    from UPDATE_LOG t'
+      '    where trunc(t.begin_refresh) = trunc(sysdate-1) '
+      '    group by t.object_name '
+      ') t'
+      'left join ('
+      '    select '
+      '         t.object_name '
+      
+        '        ,trunc((max(t.end_refresh) - min(t.begin_refresh))*60*24' +
+        ') as duration'
+      '        ,min(t.begin_refresh) as begin_refresh'
+      '        ,max(t.end_refresh) as end_refresh'
+      '        ,count(*) as cnt'
+      '    from UPDATE_LOG t'
+      '    where trunc(t.begin_refresh) = trunc(sysdate) '
+      '    group by t.object_name '
+      ') a on a.object_name = t.object_name'
+      'order by t.object_name')
+    Left = 88
+    Top = 32
+  end
+  object DataSource1: TDataSource
+    DataSet = ADOQuery1
+    Left = 160
+    Top = 32
+  end
+end
